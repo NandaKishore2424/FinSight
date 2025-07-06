@@ -12,7 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         let query = {};
         if (month !== undefined && year !== undefined) {
-          // Ensure month and year are properly parsed as integers
           query = { 
             month: parseInt(month as string, 10), 
             year: parseInt(year as string, 10) 
@@ -33,19 +32,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const { category, amount, month, year } = req.body;
         
-        // Try to find existing budget for this category and period
         let budget = await Budget.findOne({ 
           category, 
           month: parseInt(month), 
           year: parseInt(year) 
         });
         
-        // If exists, update it
         if (budget) {
           budget.amount = amount;
           await budget.save();
         } else {
-          // Otherwise create new
           budget = await Budget.create({
             category,
             amount,

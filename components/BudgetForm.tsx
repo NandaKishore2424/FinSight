@@ -46,8 +46,6 @@ export default function BudgetForm({ onBudgetAdded, currentMonth, currentYear, b
   });
 
   const selectedCategory = watch('category');
-
-  // Set amount if budget for this category already exists
   useEffect(() => {
     if (selectedCategory) {
       const existingBudget = budgets.find(b => b.category === selectedCategory);

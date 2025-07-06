@@ -13,3 +13,17 @@ input:focus, select:focus {
 option {
   @apply bg-white text-gray-900 dark:bg-gray-700 dark:text-white;
 }
+
+.dark .recharts-text {
+  fill: #e5e7eb !important;
+}
+
+.dark .recharts-tooltip-item-name,
+.dark .recharts-tooltip-item-value,
+.dark .recharts-tooltip-label {
+  color: #f9fafb !important;
+}
+
+.dark .recharts-legend-item-text {
+  color: #e5e7eb !important;
+}

@@ -28,13 +28,11 @@ export default function ExpensesChart({ transactions }: ExpensesChartProps) {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     
-    // Initialize data for all months
     const data = months.map(month => ({
       month,
       total: 0,
     }));
     
-    // Group transactions by month and calculate totals
     transactions.forEach(transaction => {
       const date = new Date(transaction.date);
       const monthIndex = date.getMonth();

@@ -26,6 +26,14 @@ type BudgetInsightsProps = {
   year: number;
 };
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
 export default function BudgetInsights({ 
   transactions, 
   budgets,
@@ -42,7 +50,6 @@ export default function BudgetInsights({
       year
     });
     
-    // For better debugging
     console.log("Raw transactions data:", transactions.map(t => ({
       date: new Date(t.date),
       month: new Date(t.date).getMonth(),
@@ -55,18 +62,15 @@ export default function BudgetInsights({
       return [];
     }
     
-    // Filter transactions for current month/year - using proper date handling
     const currentMonthTransactions = transactions.filter(transaction => {
-      // Ensure date is handled correctly - may need to be converted first
       const transactionDate = new Date(transaction.date);
       return (
         transactionDate.getMonth() === month && 
         transactionDate.getFullYear() === year &&
-        transaction.category // Only consider transactions with categories
+        transaction.category 
       );
     });
     
-    // After filtering for current month
     console.log("Current month filtered transactions:", currentMonthTransactions.map(t => ({
       category: t.category,
       amount: t.amount
@@ -74,23 +78,20 @@ export default function BudgetInsights({
     
     console.log("Current month transactions:", currentMonthTransactions.length);
     
-    // Get previous month
     const prevMonth = month === 0 ? 11 : month - 1;
     const prevYear = month === 0 ? year - 1 : year;
     
-    // Filter transactions for previous month/year
     const prevMonthTransactions = transactions.filter(transaction => {
       const transactionDate = new Date(transaction.date);
       return (
         transactionDate.getMonth() === prevMonth && 
         transactionDate.getFullYear() === prevYear &&
-        transaction.category // Only consider transactions with categories
+        transaction.category 
       );
     });
     
     console.log("Previous month transactions:", prevMonthTransactions.length);
     
-    // Calculate spending by category for current month
     const spendingByCategory = {};
     currentMonthTransactions.forEach(transaction => {
       const { category, amount } = transaction;
@@ -102,7 +103,6 @@ export default function BudgetInsights({
       spendingByCategory[category] += Math.abs(amount);
     });
     
-    // Calculate spending by category for previous month
     const prevSpendingByCategory = {};
     prevMonthTransactions.forEach(transaction => {
       const { category, amount } = transaction;
@@ -119,7 +119,6 @@ export default function BudgetInsights({
     
     const insightsList = [];
     
-    // Insight 1: Categories over budget
     const overBudgetCategories = budgets
       .filter(budget => {
         const spent = spendingByCategory[budget.category] || 0;
@@ -154,12 +153,11 @@ export default function BudgetInsights({
       }
     }
     
-    // Insight 2: Categories with increased spending
     const increasedSpendingCategories = Object.keys(spendingByCategory)
       .filter(category => {
         const currentSpent = spendingByCategory[category] || 0;
         const prevSpent = prevSpendingByCategory[category] || 0;
-        return prevSpent > 0 && currentSpent > prevSpent * 1.2; // 20% increase
+        return prevSpent > 0 && currentSpent > prevSpent * 1.2; 
       })
       .sort((a, b) => {
         const aIncrease = (spendingByCategory[a] || 0) - (prevSpendingByCategory[a] || 0);
@@ -181,12 +179,11 @@ export default function BudgetInsights({
       });
     }
     
-    // Insight 3: Categories with decreased spending
     const decreasedSpendingCategories = Object.keys(spendingByCategory)
       .filter(category => {
         const currentSpent = spendingByCategory[category] || 0;
         const prevSpent = prevSpendingByCategory[category] || 0;
-        return prevSpent > 0 && currentSpent < prevSpent * 0.8; // 20% decrease
+        return prevSpent > 0 && currentSpent < prevSpent * 0.8; 
       })
       .sort((a, b) => {
         const aDecrease = (prevSpendingByCategory[a] || 0) - (spendingByCategory[a] || 0);
@@ -208,17 +205,15 @@ export default function BudgetInsights({
       });
     }
     
-    // Insight 4: Well managed categories
     const wellManagedCategories = budgets
       .filter(budget => {
         const spent = spendingByCategory[budget.category] || 0;
-        // Between 80% and 100% of budget
         return spent >= budget.amount * 0.8 && spent <= budget.amount;
       })
       .sort((a, b) => {
         const aPercentage = (spendingByCategory[a.category] || 0) / a.amount;
         const bPercentage = (spendingByCategory[b.category] || 0) / b.amount;
-        return bPercentage - aPercentage; // Closest to budget first
+        return bPercentage - aPercentage; 
       });
     
     if (wellManagedCategories.length > 0) {
@@ -230,7 +225,6 @@ export default function BudgetInsights({
       });
     }
     
-    // Insight 5: General advice based on overall spending
     const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
     const totalSpent = Object.values(spendingByCategory).reduce((sum: number, amount: number) => sum + amount, 0);
     
@@ -242,8 +236,6 @@ export default function BudgetInsights({
         description: `You've only used ${((totalSpent / totalBudget) * 100).toFixed(0)}% of your total budget. Consider saving the difference!`
       });
     }
-    
-    // Add a basic insight if we have budget and spending data but no other insights
     if (insightsList.length === 0 && totalBudget > 0) {
       const percentUsed = (totalSpent / totalBudget) * 100;
       insightsList.push({
@@ -256,14 +248,6 @@ export default function BudgetInsights({
     
     return insightsList;
   }, [transactions, budgets, month, year, isDarkMode]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
 
   console.log("Rendering BudgetInsights with", insights.length, "insights");
 
@@ -307,14 +291,10 @@ export default function BudgetInsights({
                   {insight.icon}
                 </div>
                 <div>
-                  <h4 className={`font-medium ${
-                    isDarkMode ? 'text-white' : 'text-gray-800'
-                  }`}>
+                  <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                     {insight.title}
                   </h4>
-                  <p className={`text-sm mt-1 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
+                  <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     {insight.description}
                   </p>
                 </div>

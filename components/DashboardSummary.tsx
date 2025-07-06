@@ -15,17 +15,16 @@ type DashboardSummaryProps = {
 
 export default function DashboardSummary({ transactions }: DashboardSummaryProps) {
   const summaryData = useMemo(() => {
-    // Total expenses
     const totalExpenses = transactions.reduce((sum, transaction) => 
       sum + Math.abs(transaction.amount), 0);
     
-    // Most frequent category
+    
     const categoryCounts = {};
     const categoryTotals = {};
     
     transactions.forEach(transaction => {
       const { category, amount } = transaction;
-      if (!category) return; // Skip if no category
+      if (!category) return; 
       
       categoryCounts[category] = (categoryCounts[category] || 0) + 1;
       categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
@@ -40,8 +39,7 @@ export default function DashboardSummary({ transactions }: DashboardSummaryProps
         topCategoryCount = count as number;
       }
     });
-    
-    // Get top spending category
+  
     let topSpendingCategory = null;
     let topSpendingAmount = 0;
     
@@ -52,7 +50,6 @@ export default function DashboardSummary({ transactions }: DashboardSummaryProps
       }
     });
     
-    // Most recent transaction
     const sortedTransactions = [...transactions].sort((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );

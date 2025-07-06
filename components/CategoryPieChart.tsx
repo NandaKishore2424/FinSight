@@ -21,7 +21,6 @@ type CategoryPieChartProps = {
   transactions: Transaction[];
 };
 
-// Color palette for categories
 const CATEGORY_COLORS = {
   'Housing': '#8884d8',
   'Transportation': '#83a6ed',
@@ -46,7 +45,7 @@ export default function CategoryPieChart({ transactions }: CategoryPieChartProps
     
     transactions.forEach(transaction => {
       const { category, amount } = transaction;
-      if (!category) return; // Skip if no category
+      if (!category) return;
       categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
     });
     
@@ -55,8 +54,8 @@ export default function CategoryPieChart({ transactions }: CategoryPieChartProps
         name,
         value,
       }))
-      .filter(item => item.value > 0) // Only show categories with spending
-      .sort((a, b) => (b.value as number) - (a.value as number)); // Sort by highest amount
+      .filter(item => item.value > 0) 
+      .sort((a, b) => (b.value as number) - (a.value as number)); 
   }, [transactions]);
 
   if (transactions.length === 0) {

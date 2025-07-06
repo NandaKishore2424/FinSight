@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   
-  // Validate MongoDB ObjectId
   if (!mongoose.Types.ObjectId.isValid(id as string)) {
     return res.status(400).json({ success: false, error: 'Invalid ID format' });
   }

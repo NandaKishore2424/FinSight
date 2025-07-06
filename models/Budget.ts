@@ -35,10 +35,9 @@ const BudgetSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create a compound index for category, month, and year to ensure uniqueness
 BudgetSchema.index({ category: 1, month: 1, year: 1 }, { unique: true });
 
-// Only create the model on the server side
+
 let Budget;
 
 if (typeof window === 'undefined') {

@@ -46,17 +46,14 @@ export default function BudgetComparisonChart({
   const { isDarkMode } = useTheme();
   
   const comparisonData = useMemo(() => {
-    // Filter transactions for current month/year
     const filteredTransactions = transactions.filter(transaction => {
       const transactionDate = new Date(transaction.date);
       return (
         transactionDate.getMonth() === month && 
         transactionDate.getFullYear() === year &&
-        transaction.category // Ensure transaction has a category
+        transaction.category 
       );
     });
-    
-    // Get spending by category
     const spendingByCategory = {};
     filteredTransactions.forEach(transaction => {
       const { category, amount } = transaction;
@@ -66,7 +63,6 @@ export default function BudgetComparisonChart({
       spendingByCategory[category] += Math.abs(amount);
     });
     
-    // Create comparison data with budgets
     const data = budgets.map(budget => {
       const actual = spendingByCategory[budget.category] || 0;
       const percentageUsed = budget.amount > 0 ? (actual / budget.amount) * 100 : 0;
@@ -82,7 +78,6 @@ export default function BudgetComparisonChart({
       };
     });
     
-    // Sort by percentage used (descending)
     return data.sort((a, b) => b.percentageUsed - a.percentageUsed);
   }, [transactions, budgets, month, year]);
 
@@ -134,14 +129,14 @@ export default function BudgetComparisonChart({
               />
               <XAxis 
                 dataKey="category" 
-                tick={{fill: isDarkMode ? '#9ca3af' : '#4b5563'}}
+                tick={{fill: isDarkMode ? '#e5e7eb' : '#4b5563'}} 
                 angle={-45}
                 textAnchor="end"
                 height={70}
               />
               <YAxis 
                 tickFormatter={formatCurrency}
-                tick={{fill: isDarkMode ? '#9ca3af' : '#4b5563'}}
+                tick={{fill: isDarkMode ? '#e5e7eb' : '#4b5563'}} 
               />
               <Tooltip 
                 formatter={(value) => [formatCurrency(value), 'Amount']}
@@ -150,12 +145,17 @@ export default function BudgetComparisonChart({
                   borderColor: isDarkMode ? '#374151' : '#e5e7eb',
                   color: isDarkMode ? '#f9fafb' : '#111827'
                 }}
+                labelStyle={{
+                  color: isDarkMode ? '#f9fafb' : '#111827' 
+                }}
               />
               <Legend 
                 wrapperStyle={{ 
-                  paddingTop: 20,
-                  color: isDarkMode ? '#f9fafb' : '#111827' 
+                  paddingTop: 20
                 }}
+                formatter={(value) => (
+                  <span style={{ color: isDarkMode ? '#e5e7eb' : '#4b5563' }}>{value}</span>
+                )}
               />
               <Bar 
                 name="Budget" 

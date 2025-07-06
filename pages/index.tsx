@@ -78,7 +78,6 @@ export default function Dashboard() {
   
   const handleEditTransaction = (transaction: Transaction) => {
     setTransactionToEdit(transaction);
-    // Scroll to form when editing
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 

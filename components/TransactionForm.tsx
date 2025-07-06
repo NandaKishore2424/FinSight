@@ -52,12 +52,10 @@ export default function TransactionForm({
     },
   });
 
-  // Set form values when a transaction is provided for editing
   useEffect(() => {
     if (transactionToEdit) {
       setIsEditMode(true);
       setValue('amount', transactionToEdit.amount);
-      // Format date for the input field (YYYY-MM-DD)
       setValue('date', new Date(transactionToEdit.date).toISOString().split('T')[0]);
       setValue('description', transactionToEdit.description);
       setValue('category', transactionToEdit.category);
@@ -72,7 +70,7 @@ export default function TransactionForm({
     }
   }, [transactionToEdit, setValue, reset]);
 
-  // Update the onSubmit function in TransactionForm
+  
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     
@@ -92,7 +90,7 @@ export default function TransactionForm({
         },
         body: JSON.stringify({
           amount: parseFloat(data.amount.toString()),
-          date: formattedDate.toISOString(), // Ensure consistent date format
+          date: formattedDate.toISOString(), 
           description: data.description,
           category: data.category,
         }),
@@ -110,7 +108,7 @@ export default function TransactionForm({
           : 'Transaction added successfully',
       });
       
-      // Reset the form and edit mode
+      
       reset();
       if (isEditMode) {
         resetEditMode();

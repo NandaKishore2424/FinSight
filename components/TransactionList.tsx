@@ -31,7 +31,7 @@ export default function TransactionList({
   onEditTransaction 
 }: TransactionListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const { isDarkMode } = useTheme(); // Get the dark mode state
+  const { isDarkMode } = useTheme(); 
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Export categories separately so they can be used on the client
+
 export const TransactionCategories = [
   'Housing', 'Transportation', 'Food',
   'Utilities', 'Healthcare', 'Insurance', 'Entertainment', 'Personal',
@@ -8,7 +8,7 @@ export const TransactionCategories = [
   'Shopping', 'Other'
 ];
 
-// Only create the model when on the server side
+
 const TransactionSchema = new mongoose.Schema({
   amount: {
     type: Number,
@@ -44,16 +44,11 @@ const TransactionSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Use this technique to prevent model compilation on the client side
 let Transaction;
 
-// Check if we're on the server side before trying to create the model
 if (typeof window === 'undefined') {
-  // We're on the server side, so it's safe to create/access the model
   Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
 } else {
-  // We're on the client side, so don't try to create the model
-  // Just export a placeholder that won't be used directly by client components
   Transaction = {} as any;
 }
 

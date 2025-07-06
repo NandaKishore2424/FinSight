@@ -10,7 +10,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Initialize theme from localStorage on component mount
+  
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -27,10 +27,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     setIsDarkMode(prevMode => {
       const newMode = !prevMode;
-      // Save to localStorage
+      
       localStorage.setItem('theme', newMode ? 'dark' : 'light');
       
-      // Update document class for Tailwind dark mode
+      
       if (newMode) {
         document.documentElement.classList.add('dark');
       } else {

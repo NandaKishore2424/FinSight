@@ -52,10 +52,8 @@ export function useToast() {
   return context;
 }
 
-// For compatibility with your code
 export const toast = (args: Toast) => {
   if (typeof window !== "undefined") {
-    // @ts-ignore
     window.__TOAST__?.(args);
   }
 };
