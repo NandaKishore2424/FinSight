@@ -30,6 +30,7 @@ declare module 'recharts' {
     name?: string;
     radius?: number | number[];
     fillOpacity?: number;
+    children?: React.ReactNode; 
   }
   
   export interface TooltipProps {
