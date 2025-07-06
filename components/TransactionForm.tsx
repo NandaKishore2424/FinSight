@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { toast } from '../components/ui/use-toast';
-import { TransactionCategories } from '../models/Transaction';
 import { useTheme } from '../context/ThemeContext';
 
 type Transaction = {
@@ -80,24 +79,22 @@ export default function TransactionForm({
       
       const method = isEditMode ? 'PUT' : 'POST';
       const url = isEditMode 
-        ? `/api/transactions/${transactionToEdit?._id}` 
+        ? `/api/transactions/${transactionToEdit._id}` 
         : '/api/transactions';
       
-      const res = await fetch(url, {
+      const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: parseFloat(data.amount.toString()),
-          date: formattedDate.toISOString(), 
-          description: data.description,
-          category: data.category,
+          ...data,
+          date: formattedDate
         }),
       });
 
-      if (!res.ok) {
-        const error = await res.json();
+      if (!response.ok) {
+        const error = await response.json();
         throw new Error(error.error || 'Something went wrong');
       }
 

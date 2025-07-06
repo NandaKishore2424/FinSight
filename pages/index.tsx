@@ -112,7 +112,32 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    refreshAllData();
+    
+    fetch('/api/transactions')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setTransactions(data.data);
+        } else {
+          console.error("Failed to fetch transactions:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching transactions:", error);
+      });
+
+    fetch(`/api/budgets?month=${currentMonth}&year=${currentYear}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setBudgets(data.data);
+        } else {
+          console.error("Failed to fetch budgets:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching budgets:", error);
+      });
   }, [currentMonth, currentYear]);
 
   return (
