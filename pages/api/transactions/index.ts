@@ -1,39 +1,70 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongodb';
 import Transaction from '../../../models/Transaction';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await dbConnect();
-
-  switch (req.method) {
-    case 'GET':
+  console.log('API Route called:', req.method);
+  
+  try {
+    await dbConnect();
+    console.log('Database connected successfully');
+    
+    if (req.method === 'GET') {
       try {
         const transactions = await Transaction.find({}).sort({ date: -1 });
-        res.status(200).json({ success: true, data: transactions });
+        console.log('Transactions fetched:', transactions.length);
+        
+        res.status(200).json({ 
+          success: true, 
+          data: transactions,
+          count: transactions.length 
+        });
       } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        console.error('Error fetching transactions:', error);
+        res.status(500).json({ 
+          success: false, 
+          error: 'Failed to fetch transactions',
+          details: error.message 
+        });
       }
-      break;
-      
-    case 'POST':
+    } else if (req.method === 'POST') {
       try {
         const { amount, date, description, category } = req.body;
         
-        const transaction = await Transaction.create({
+        const transaction = new Transaction({
           amount,
-          date,
+          date: new Date(date),
           description,
-          category: category || 'Other' 
+          category,
         });
         
-        res.status(201).json({ success: true, data: transaction });
+        await transaction.save();
+        console.log('Transaction saved:', transaction._id);
+        
+        res.status(201).json({ 
+          success: true, 
+          data: transaction 
+        });
       } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        console.error('Error creating transaction:', error);
+        res.status(400).json({ 
+          success: false, 
+          error: 'Failed to create transaction',
+          details: error.message 
+        });
       }
-      break;
-      
-    default:
-      res.status(405).json({ success: false, error: 'Method not allowed' });
-      break;
+    } else {
+      res.status(405).json({ 
+        success: false, 
+        error: `Method ${req.method} not allowed` 
+      });
+    }
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Database connection failed',
+      details: error.message 
+    });
   }
 }

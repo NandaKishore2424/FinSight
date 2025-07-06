@@ -152,32 +152,39 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const transactionsResponse = await fetch('/api/transactions');
+        const transactionsData = await transactionsResponse.json();
+        
+        if (transactionsData.success) {
+          setTransactions(transactionsData.data);
+        } else {
+          console.error("Failed to fetch transactions:", transactionsData.error);
+          setError(`Failed to fetch transactions: ${transactionsData.error}`);
+        }
+        
+        const budgetsResponse = await fetch(`/api/budgets?month=${currentMonth}&year=${currentYear}`);
+        const budgetsData = await budgetsResponse.json();
+        
+        if (budgetsData.success) {
+          setBudgets(budgetsData.data);
+        } else {
+          console.error("Failed to fetch budgets:", budgetsData.error);
+          setError(prev => prev ? `${prev} | Failed to fetch budgets: ${budgetsData.error}` : `Failed to fetch budgets: ${budgetsData.error}`);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(`Network error: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    fetch('/api/transactions')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setTransactions(data.data);
-        } else {
-          console.error("Failed to fetch transactions:", data.error);
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching transactions:", error);
-      });
-
-    fetch(`/api/budgets?month=${currentMonth}&year=${currentYear}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setBudgets(data.data);
-        } else {
-          console.error("Failed to fetch budgets:", data.error);
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching budgets:", error);
-      });
+    fetchData();
   }, [currentMonth, currentYear]);
 
   return (

@@ -1,63 +1,86 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongodb';
 import Budget from '../../../models/Budget';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await dbConnect();
-
-  switch (req.method) {
-    case 'GET':
+  console.log('Budget API Route called:', req.method);
+  
+  try {
+    await dbConnect();
+    console.log('Database connected successfully');
+    
+    if (req.method === 'GET') {
       try {
         const { month, year } = req.query;
         
-        let query = {};
-        if (month !== undefined && year !== undefined) {
-          query = { 
-            month: parseInt(month as string, 10), 
-            year: parseInt(year as string, 10) 
-          };
-        }
+        const budgets = await Budget.find({
+          month: parseInt(month as string) || new Date().getMonth(),
+          year: parseInt(year as string) || new Date().getFullYear()
+        });
         
-        console.log("Budget query:", query);
-        const budgets = await Budget.find(query);
-        console.log("Found budgets:", budgets.length);
-        res.status(200).json({ success: true, data: budgets });
+        console.log('Budgets fetched:', budgets.length);
+        
+        res.status(200).json({ 
+          success: true, 
+          data: budgets,
+          count: budgets.length 
+        });
       } catch (error) {
-        console.error("Budget fetch error:", error);
-        res.status(400).json({ success: false, error: error.message });
+        console.error('Error fetching budgets:', error);
+        res.status(500).json({ 
+          success: false, 
+          error: 'Failed to fetch budgets',
+          details: error.message 
+        });
       }
-      break;
-      
-    case 'POST':
+    } else if (req.method === 'POST') {
       try {
         const { category, amount, month, year } = req.body;
         
-        let budget = await Budget.findOne({ 
-          category, 
-          month: parseInt(month), 
-          year: parseInt(year) 
-        });
+        // Check if budget already exists for this category and month
+        const existingBudget = await Budget.findOne({ category, month, year });
         
-        if (budget) {
-          budget.amount = amount;
-          await budget.save();
+        if (existingBudget) {
+          // Update existing budget
+          existingBudget.amount = amount;
+          await existingBudget.save();
+          console.log('Budget updated:', existingBudget._id);
+          
+          res.status(200).json({ 
+            success: true, 
+            data: existingBudget 
+          });
         } else {
-          budget = await Budget.create({
-            category,
-            amount,
-            month: parseInt(month),
-            year: parseInt(year)
+          // Create new budget
+          const budget = new Budget({ category, amount, month, year });
+          await budget.save();
+          console.log('Budget created:', budget._id);
+          
+          res.status(201).json({ 
+            success: true, 
+            data: budget 
           });
         }
-        
-        res.status(201).json({ success: true, data: budget });
       } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        console.error('Error creating/updating budget:', error);
+        res.status(400).json({ 
+          success: false, 
+          error: 'Failed to create/update budget',
+          details: error.message 
+        });
       }
-      break;
-      
-    default:
-      res.status(405).json({ success: false, error: 'Method not allowed' });
-      break;
+    } else {
+      res.status(405).json({ 
+        success: false, 
+        error: `Method ${req.method} not allowed` 
+      });
+    }
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Database connection failed',
+      details: error.message 
+    });
   }
 }
