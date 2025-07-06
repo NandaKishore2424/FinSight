@@ -11,7 +11,10 @@ type ToastContextType = {
   toasts: Toast[];
 };
 
+
 export const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+let toastFunction: ((toast: Toast) => void) | undefined;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -22,6 +25,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       setToasts((prev) => prev.slice(1));
     }, 3000);
   };
+
+  toastFunction = toast;
 
   return (
     <ToastContext.Provider value={{ toast, toasts }}>
@@ -54,7 +59,9 @@ export function useToast() {
 }
 
 export const toast = (args: Toast) => {
-  if (typeof window !== "undefined") {
-    window.__TOAST__?.(args);
+  if (toastFunction) {
+    toastFunction(args);
+  } else {
+    console.warn("Toast function called before ToastProvider was initialized");
   }
 };
