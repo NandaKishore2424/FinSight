@@ -11,6 +11,7 @@ import { Menu, X, BarChart3, PieChart, DollarSign, User, Moon, Sun, Plus } from 
 import BudgetForm from "../components/BudgetForm";
 import BudgetComparisonChart from "../components/BudgetComparisonChart";
 import BudgetInsights from "../components/BudgetInsights";
+import { toast } from "../components/ui/use-toast";
 
 type Transaction = {
   _id: string;
@@ -37,6 +38,7 @@ export default function Dashboard() {
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [isSeeding, setIsSeeding] = useState(false);
   
   const formRef = useRef<HTMLDivElement>(null);
   const analyticsRef = useRef<HTMLDivElement>(null);
@@ -109,6 +111,44 @@ export default function Dashboard() {
   
   const scrollToBudget = () => {
     budgetRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const seedDemoData = async () => {
+    setIsSeeding(true);
+    try {
+      const response = await fetch('/api/seed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: "Demo Data Added!",
+          description: "Sample transactions and budgets have been added to showcase the app features.",
+        });
+        // Refresh the data
+        fetchTransactions();
+        fetchBudgets();
+      } else {
+        toast({
+          title: "Note",
+          description: "Demo data already exists or failed to add.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add demo data.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSeeding(false);
+    }
   };
 
   useEffect(() => {
@@ -366,6 +406,7 @@ export default function Dashboard() {
                     {transactions.length} Transactions
                   </div>
                 </div>
+                
                 {loading ? (
                   <div className="flex justify-center items-center py-16">
                     <div className="h-12 w-12 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
@@ -374,7 +415,44 @@ export default function Dashboard() {
                   <div className="text-center py-10 text-red-600 font-semibold bg-red-50 rounded-xl border border-red-100">
                     {error}
                   </div>
+                ) : transactions.length === 0 ? (
+                  // Welcome message when no transactions exist
+                  <div className="text-center py-16">
+                    <div className="mb-6">
+                      <DollarSign size={48} className={`mx-auto ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                    </div>
+                    <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                      Welcome to FinSight!
+                    </h3>
+                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
+                      Get started by adding your first transaction or load some demo data to explore the features.
+                    </p>
+                    <div className="flex justify-center gap-4">
+                      <button
+                        onClick={seedDemoData}
+                        disabled={isSeeding}
+                        className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                          isDarkMode 
+                            ? 'bg-green-600 hover:bg-green-700 text-white' 
+                            : 'bg-green-500 hover:bg-green-600 text-white'
+                        } disabled:opacity-50`}
+                      >
+                        {isSeeding ? 'Loading Demo Data...' : 'Load Demo Data'}
+                      </button>
+                      <button
+                        onClick={scrollToForm}
+                        className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                          isDarkMode 
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        }`}
+                      >
+                        Add First Transaction
+                      </button>
+                    </div>
+                  </div>
                 ) : (
+                  // Show transaction list when transactions exist
                   <TransactionList
                     transactions={transactions}
                     onTransactionDeleted={fetchTransactions}
