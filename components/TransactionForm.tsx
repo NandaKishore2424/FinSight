@@ -5,6 +5,7 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { toast } from '../components/ui/use-toast';
 import { useTheme } from '../context/ThemeContext';
+import { TransactionCategories } from '../constants/categories';
 
 type Transaction = {
   _id?: string;

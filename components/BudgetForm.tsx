@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Select } from './ui/select';
 import { toast } from './ui/use-toast';
-import { TransactionCategories } from '../models/Transaction';
+import { TransactionCategories } from '../constants/categories'; 
 import { useTheme } from '../context/ThemeContext';
 
 type Budget = {

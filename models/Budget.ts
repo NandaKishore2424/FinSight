@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { TransactionCategories } from './Transaction';
+import { TransactionCategories } from '../constants/categories'; 
 
 const BudgetSchema = new mongoose.Schema({
   category: {
@@ -37,13 +37,4 @@ const BudgetSchema = new mongoose.Schema({
 
 BudgetSchema.index({ category: 1, month: 1, year: 1 }, { unique: true });
 
-
-let Budget;
-
-if (typeof window === 'undefined') {
-  Budget = mongoose.models.Budget || mongoose.model('Budget', BudgetSchema);
-} else {
-  Budget = {} as any;
-}
-
-export default Budget;
+export default mongoose.models.Budget || mongoose.model('Budget', BudgetSchema);
