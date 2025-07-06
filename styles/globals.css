@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input:focus, select:focus {
+  @apply ring-2 ring-blue-300 ring-offset-1 dark:ring-blue-500 dark:ring-offset-gray-800 transition-all duration-200;
+}
+
+.form-label {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 inline-block;
+}
+
+option {
+  @apply bg-white text-gray-900 dark:bg-gray-700 dark:text-white;
+}
