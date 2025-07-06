@@ -92,7 +92,7 @@ export default function BudgetInsights({
     
     console.log("Previous month transactions:", prevMonthTransactions.length);
     
-    const spendingByCategory = {};
+    const spendingByCategory: Record<string, number> = {};
     currentMonthTransactions.forEach(transaction => {
       const { category, amount } = transaction;
       if (!category) return;
@@ -233,11 +233,11 @@ export default function BudgetInsights({
         type: 'tip',
         icon: <Lightbulb className={`${isDarkMode ? 'text-blue-300' : 'text-blue-500'}`} />,
         title: `You're under budget`,
-        description: `You've only used ${((totalSpent / totalBudget) * 100).toFixed(0)}% of your total budget. Consider saving the difference!`
+        description: `You've only used ${(Number(totalSpent) / Number(totalBudget) * 100).toFixed(0)}% of your total budget. Consider saving the difference!`
       });
     }
     if (insightsList.length === 0 && totalBudget > 0) {
-      const percentUsed = (totalSpent / totalBudget) * 100;
+      const percentUsed = (Number(totalSpent) / Number(totalBudget) * 100);
       insightsList.push({
         type: 'tip',
         icon: <Lightbulb className={`${isDarkMode ? 'text-blue-300' : 'text-blue-500'}`} />,
