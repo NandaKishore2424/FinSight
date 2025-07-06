@@ -77,7 +77,7 @@ To get started with FinSight, follow these steps:
 2. Navigate to the project directory:
 
    ```bash
-   cd fin-sight
+   cd personal-finance-visualizer
    ```
 
 3. Install the dependencies:
