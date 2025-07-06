@@ -8,9 +8,10 @@ type Toast = {
 
 type ToastContextType = {
   toast: (toast: Toast) => void;
+  toasts: Toast[];
 };
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+export const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -23,7 +24,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ToastContext.Provider value={{ toast }}>
+    <ToastContext.Provider value={{ toast, toasts }}>
       {children}
       <div className="fixed bottom-4 right-4 z-50 space-y-2">
         {toasts.map((t, i) => (
